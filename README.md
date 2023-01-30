@@ -134,11 +134,26 @@ cat /tmp/idpcert.pem |xargs -0 zmprov md barrydegraaff.nl zimbraMyoneloginSamlSi
 zmprov mcf zimbraCsrfAllowedRefererHosts accounts.google.com
 # new since 9.0.0 patch 25 you are required to set zimbraVirtualHostName:
 zmprov md barrydegraaff.nl zimbraVirtualHostName zimbra10.barrydegraaff.nl
-zmlocalconfig -e zimbra_same_site_cookie="" 
+/opt/zimbra/bin/zmlocalconfig -e zimbra_same_site_cookie=""  #read below section!
 zmmailboxdctl restart
 ```
 
-Please note that the disabling of the same site cookie restriction is needed to make it work, but this is due to a bug in Zimbra. Watch this article for updates, once the bug is fixed, the setting of `zimbra_same_site_cookie` should be set to `Strict`.
+### SameSite Cookie restriction and SAML
+
+If your IDP and Zimbra are on the same domain in an on-premise deployment. For example zimbra.example.com and saml-idp.example.com you can use SameSite cookie setting Strict:
+
+```
+/opt/zimbra/bin/zmlocalconfig -e zimbra_same_site_cookie="Strict"
+zmmailboxdctl restart
+```
+
+If your IDP is under a different domain in a hosted SaaS IDP deployment. For example zimbra.example.com and saml.authprovider.org you probably have to disable the SameSite cookie setting as follows:
+
+```
+/opt/zimbra/bin/zmlocalconfig -e zimbra_same_site_cookie=""
+zmmailboxdctl restart
+```
+
 
 ### Test SAML Login
 
